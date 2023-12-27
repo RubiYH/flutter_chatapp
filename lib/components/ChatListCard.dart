@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
+import 'package:flutter_chatapp/screens/chat_screen.dart';
 
 class ChatListCard extends StatelessWidget {
   const ChatListCard({
@@ -10,14 +10,23 @@ class ChatListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 130,
-      child: Expanded(
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          color: Colors.white,
-          surfaceTintColor: Colors.transparent,
-          elevation: 2,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        color: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 2,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const Chat(),
+              ),
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
@@ -73,11 +82,13 @@ class ChatListCard extends StatelessWidget {
                 ),
                 const Align(
                   alignment: Alignment.centerRight,
-                  child: Text("15 mins ago.",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w300,
-                      )),
+                  child: Text(
+                    "15 mins ago.",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w300,
+                    ),
+                  ),
                 ),
               ],
             ),
