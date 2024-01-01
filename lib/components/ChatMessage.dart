@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chatapp/globals.dart';
 
 class ChatMessage extends StatelessWidget {
   final String message, sentAt;
@@ -24,8 +25,7 @@ class ChatMessage extends StatelessWidget {
             children: [
               if (!selfSent)
                 const CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://lh3.google.com/u/0/ogw/ANLem4YhMQ9VVephNQ0m4A_jRJxxeSkSKYCi7ELdJ6-R=s32-c-mo"),
+                  backgroundImage: NetworkImage(globals_default_avatar),
                   radius: 16,
                 ),
               const SizedBox(

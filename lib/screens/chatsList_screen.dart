@@ -17,10 +17,17 @@ class _ChatListsState extends State<ChatLists> {
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Ionicons.add_outline,
+                size: 28,
+              ),
+            ),
             SizedBox(
-              width: 200,
+              width: 180,
               child: TextField(
                 focusNode: _focusNode,
                 onTapOutside: (event) => _focusNode.unfocus(),
@@ -39,22 +46,41 @@ class _ChatListsState extends State<ChatLists> {
           ],
         ),
         const Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
               height: 20,
             ),
-            ChatListCard(),
-            ChatListCard(),
-            ChatListCard(),
-            ChatListCard(),
-            ChatListCard(),
-            ChatListCard(),
-            ChatListCard(),
-            ChatListCard(),
-            ChatListCard(),
-            ChatListCard(),
-            ChatListCard(),
+            ChatListCard(
+              username: "Username",
+              sentAt: "1 min ago",
+              unread: 1,
+            ),
+            ChatListCard(
+              username: "Usernameweweweweewewewewewe",
+              sentAt: "1 min ago",
+              message: "dsdsdsdsdsdsdsdsdsdsdsdsddsddsdssdsdsdsdsdsd",
+              unread: 1,
+            ),
+            ChatListCard(
+              username: "Username",
+              sentAt: "1 min ago",
+              unread: 1,
+            ),
+            ChatListCard(
+              username: "Username",
+              sentAt: "1 min ago",
+              unread: 1,
+            ),
+            ChatListCard(
+              username: "Username",
+              sentAt: "1 min ago",
+              unread: 1,
+            ),
+            ChatListCard(
+              username: "Username",
+              sentAt: "1 min ago",
+              unread: 1,
+            ),
           ],
         )
       ],

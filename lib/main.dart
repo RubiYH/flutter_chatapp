@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chatapp/screens/chatLists_screen.dart';
-import 'package:flutter_chatapp/screens/contacts_screen.dart';
+import 'package:flutter_chatapp/screens/chatsList_screen.dart';
+import 'package:flutter_chatapp/screens/contactsList_screen.dart';
 import 'package:flutter_chatapp/screens/myaccount_screen.dart';
 import 'package:ionicons/ionicons.dart';
 
@@ -31,13 +31,6 @@ class _AppState extends State<App> {
               fontSize: 40,
               fontWeight: FontWeight.w600,
               color: Colors.black,
-              shadows: [
-                Shadow(
-                  blurRadius: 5.0,
-                  color: Colors.black26,
-                  offset: Offset(0.0, 2.0),
-                )
-              ],
             ),
           ),
           backgroundColor: Colors.transparent,

@@ -1,29 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chatapp/globals.dart';
 import 'package:flutter_chatapp/screens/chat_screen.dart';
 
 class ChatListCard extends StatelessWidget {
-  const ChatListCard({
-    super.key,
-  });
+  final String username, message, sentAt, avatarURL;
+  final int unread;
+
+  const ChatListCard(
+      {super.key,
+      required this.username,
+      this.message = "메시지가 없습니다.",
+      required this.sentAt,
+      this.unread = 0,
+      this.avatarURL = globals_default_avatar});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 130,
+      height: 140,
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
         color: Colors.white,
         surfaceTintColor: Colors.transparent,
-        elevation: 2,
+        elevation: 0,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const Chat(),
+                builder: (context) => ChatScreen(username: username),
               ),
             );
           },
@@ -32,59 +40,73 @@ class ChatListCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "User",
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(avatarURL),
+                            radius: 16,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Flexible(
                             child: Text(
-                              "12",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
+                              username,
+                              style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w500,
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            unread.toString(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
                             ),
                           ),
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                    )
+                  ],
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "This is a test message.",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    message,
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        overflow: TextOverflow.ellipsis),
                   ),
                 ),
-                const Align(
+                Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    "15 mins ago.",
-                    style: TextStyle(
+                    sentAt,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w300,
                     ),

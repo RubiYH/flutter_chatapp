@@ -1,17 +1,20 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/components/ChatMessage.dart';
 import 'package:ionicons/ionicons.dart';
 
-class Chat extends StatefulWidget {
-  const Chat({super.key});
+class ChatScreen extends StatefulWidget {
+  final String username;
+
+  const ChatScreen({
+    super.key,
+    required this.username,
+  });
 
   @override
-  State<Chat> createState() => _ChatState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatState extends State<Chat> {
+class _ChatScreenState extends State<ChatScreen> {
   final textController = TextEditingController();
   String? inputText;
 
@@ -43,8 +46,14 @@ class _ChatState extends State<Chat> {
     return Scaffold(
       backgroundColor: Colors.lightBlue.shade100,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Ionicons.chevron_back_outline),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         title: Text(
-          "User",
+          widget.username,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w500,
@@ -61,6 +70,7 @@ class _ChatState extends State<Chat> {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(10),
+              reverse: true,
               children: const [
                 ChatMessage(
                   selfSent: false,
