@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_chatapp/screens/chatsList_screen.dart';
 import 'package:flutter_chatapp/screens/contactsList_screen.dart';
 import 'package:flutter_chatapp/screens/myaccount_screen.dart';
 import 'package:ionicons/ionicons.dart';
 
 void main() {
-  runApp(const App());
+  runApp(const App(
+    index: 0,
+  ));
 }
 
 class App extends StatefulWidget {
-  const App({super.key});
+  final int index;
+
+  const App({super.key, this.index = 0});
 
   @override
   State<App> createState() => _AppState();
@@ -17,7 +22,13 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   var _index = 0;
-  static const title = ["Chats", "Contacts", "My Account"];
+  static const title = ["채팅", "연락처", "내 계정"];
+
+  @override
+  void initState() {
+    super.initState();
+    _index = widget.index;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +36,26 @@ class _AppState extends State<App> {
       home: Scaffold(
         backgroundColor: const Color.fromRGBO(255, 255, 255, 0.95),
         appBar: AppBar(
-          title: Text(
-            title[_index],
-            style: const TextStyle(
-              fontSize: 40,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarBrightness: Brightness.light,
+            statusBarIconBrightness: Brightness.dark,
+            systemNavigationBarColor: Colors.transparent,
+          ),
+          title: Column(
+            children: [
+              const SizedBox(
+                height: 8,
+              ),
+              Text(
+                title[_index],
+                style: const TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+            ],
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -40,25 +64,31 @@ class _AppState extends State<App> {
           scrolledUnderElevation: 0,
         ),
         body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                IndexedStack(
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Expanded(
+                child: IndexedStack(
                   index: _index,
-                  children: const [ChatLists(), Contacts(), MyAccount()],
+                  children: const [
+                    SingleChildScrollView(child: ChatsList()),
+                    SingleChildScrollView(child: ContactsList()),
+                    SingleChildScrollView(child: MyAccount()),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         bottomNavigationBar: Theme(
           data: ThemeData(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent),
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            canvasColor: Colors.white,
+          ),
           child: BottomNavigationBar(
             currentIndex: _index,
             onTap: (value) {
@@ -78,7 +108,7 @@ class _AppState extends State<App> {
             ],
             type: BottomNavigationBarType.fixed,
             unselectedItemColor: Colors.black,
-            selectedItemColor: Colors.purple.shade300,
+            selectedItemColor: Colors.lightBlue.shade600,
             selectedFontSize: 14,
           ),
         ),

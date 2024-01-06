@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/components/ChatMessage.dart';
+import 'package:flutter_chatapp/components/CommonAppBar.dart';
 import 'package:ionicons/ionicons.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -45,26 +46,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightBlue.shade100,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Ionicons.chevron_back_outline),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        title: Text(
-          widget.username,
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w500,
-            color: Colors.lightBlue.shade500,
-          ),
-        ),
-        centerTitle: true,
-        scrolledUnderElevation: 0,
-        shadowColor: null,
-        elevation: 0,
-      ),
+      appBar: CommonAppBar(title: widget.username),
       body: Column(
         children: [
           Expanded(

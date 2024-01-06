@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/components/ChatListCard.dart';
 import 'package:ionicons/ionicons.dart';
 
-class ChatLists extends StatefulWidget {
-  const ChatLists({super.key});
+class ChatsList extends StatefulWidget {
+  const ChatsList({super.key});
 
   @override
-  State<ChatLists> createState() => _ChatListsState();
+  State<ChatsList> createState() => _ChatListsState();
 }
 
-class _ChatListsState extends State<ChatLists> {
+class _ChatListsState extends State<ChatsList> {
   final _focusNode = FocusNode();
 
   @override
@@ -19,27 +19,45 @@ class _ChatListsState extends State<ChatLists> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Ionicons.add_outline,
-                size: 28,
-              ),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Ionicons.filter_outline,
+                    size: 24,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Ionicons.add_outline,
+                    size: 24,
+                  ),
+                ),
+              ],
             ),
             SizedBox(
               width: 180,
+              height: 40,
               child: TextField(
                 focusNode: _focusNode,
+                cursorHeight: 20,
+                autocorrect: false,
                 onTapOutside: (event) => _focusNode.unfocus(),
                 decoration: InputDecoration(
-                  hintText: "Search",
-                  prefixIcon: const Icon(Ionicons.search_outline),
+                  isDense: true,
+                  hintText: "검색",
+                  prefixIcon: const Icon(
+                    Ionicons.search_outline,
+                  ),
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24.0),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(24.0),
+                    borderSide: BorderSide.none,
+                  ),
                   contentPadding: const EdgeInsets.all(8),
                   filled: true,
-                  fillColor: Colors.black.withOpacity(0.1),
+                  fillColor: Colors.black.withOpacity(0.075),
                 ),
               ),
             ),
@@ -59,6 +77,26 @@ class _ChatListsState extends State<ChatLists> {
               username: "Usernameweweweweewewewewewe",
               sentAt: "1 min ago",
               message: "dsdsdsdsdsdsdsdsdsdsdsdsddsddsdssdsdsdsdsdsd",
+              unread: 1,
+            ),
+            ChatListCard(
+              username: "Username",
+              sentAt: "1 min ago",
+              unread: 1,
+            ),
+            ChatListCard(
+              username: "Username",
+              sentAt: "1 min ago",
+              unread: 1,
+            ),
+            ChatListCard(
+              username: "Username",
+              sentAt: "1 min ago",
+              unread: 1,
+            ),
+            ChatListCard(
+              username: "Username",
+              sentAt: "1 min ago",
               unread: 1,
             ),
             ChatListCard(

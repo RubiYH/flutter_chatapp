@@ -1,15 +1,19 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chatapp/components/SwipeUpPageRouteBuilder.dart';
 import 'package:flutter_chatapp/globals.dart';
 import 'package:flutter_chatapp/screens/chat_screen.dart';
+import 'package:flutter_chatapp/screens/contact_detail_screen.dart';
 import 'package:flutter_chatapp/screens/myaccount_detail_screen.dart';
 import 'package:ionicons/ionicons.dart';
 
 class ContactListCard extends StatelessWidget {
-  final String username;
+  final String username, id;
   final String? avatarURL, nickname, lastChatAt;
 
   const ContactListCard({
     super.key,
+    required this.id,
     required this.username,
     this.nickname,
     this.avatarURL,
@@ -31,18 +35,18 @@ class ContactListCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           onTap: () {
             Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MyAccountDetailScreen(username: username),
-              ),
-            );
+                context,
+                SwipeUpPageRouteBuilder(
+                    ContactDetailScreen(username: username, id: id)));
           },
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                const CircleAvatar(
-                  backgroundImage: NetworkImage(globals_default_avatar),
+                CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    avatarURL ?? globals_default_avatar,
+                  ),
                   radius: 24,
                 ),
                 const SizedBox(
@@ -62,19 +66,41 @@ class ContactListCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (nickname != null)
+                      if (nickname != null || lastChatAt != null)
                         Flexible(
-                            flex: 1,
-                            child: Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Text(
-                                "별명: $nickname",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w300,
+                          flex: 1,
+                          child: Row(
+                            children: [
+                              if (nickname != null)
+                                Flexible(
+                                  child: Text(
+                                    "별명: $nickname",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
+                              const SizedBox(
+                                width: 10,
                               ),
-                            ))
+                              if (lastChatAt != null)
+                                Flexible(
+                                  child: FittedBox(
+                                    child: Text(
+                                      "마지막 채팅: $lastChatAt",
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w300,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        )
                     ],
                   ),
                 ),
