@@ -4,15 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/components/ContactListCard.dart';
 import 'package:flutter_chatapp/components/FilterPopUpMenu.dart';
 import 'package:flutter_chatapp/components/SwipeUpPageRouteBuilder.dart';
-import 'package:flutter_chatapp/models/user_model.dart';
+import 'package:flutter_chatapp/models/user_contact_model.dart';
 import 'package:flutter_chatapp/modules/getListFromPrefs_module.dart';
 import 'package:flutter_chatapp/modules/updateListToPrefs_module.dart';
 import 'package:flutter_chatapp/screens/add_contact_screen.dart';
+import 'package:flutter_chatapp/screens/contact_detail_screen.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ContactsList extends StatefulWidget {
-  const ContactsList({super.key});
+  final bool showAddButton, showActions, newChat;
+
+  const ContactsList(
+      {super.key,
+      this.showAddButton = true,
+      this.showActions = true,
+      this.newChat = false});
 
   @override
   State<ContactsList> createState() => _ContactsState();
@@ -22,9 +29,9 @@ class _ContactsState extends State<ContactsList> {
   final _focusNode = FocusNode();
   final TextEditingController textController = TextEditingController();
 
-  late List<UserModel> ValidatedList = [];
-  late List<UserModel> ContactsList = [];
-  late List<UserModel> SearchList = [];
+  late List<UserContactModel> UpdatedList = [];
+  late List<UserContactModel> ContactsList = [];
+  late List<UserContactModel> SearchList = [];
 
   @override
   void initState() {
@@ -32,23 +39,23 @@ class _ContactsState extends State<ContactsList> {
 
     if (ContactsList.isEmpty) {
       getListFromPrefs("Contacts", (item) {
-        ContactsList.add(UserModel.fromJson(item));
+        ContactsList.add(UserContactModel.fromJson(item));
       }).then((_) {
-        ValidatedList = ContactsList;
+        UpdatedList = ContactsList;
         setState(() {});
       }).then((_) {
         textController.addListener(() {
           var searchValue = textController.text.trim();
 
           if (searchValue.isEmpty) {
-            ValidatedList = ContactsList;
+            UpdatedList = ContactsList;
             return;
           }
 
           SearchList = ContactsList.where((u) =>
                   u.username.toLowerCase().contains(searchValue.toLowerCase()))
               .toList();
-          ValidatedList = SearchList;
+          UpdatedList = SearchList;
 
           setState(() {});
         });
@@ -56,27 +63,46 @@ class _ContactsState extends State<ContactsList> {
     }
   }
 
-  void onFilterChange(filterMenu item) {
+  void onFilterChange(filterContactMenu item) {
     switch (item) {
-      case filterMenu.latest:
-        ValidatedList.sort((a, b) =>
-            DateTime.parse(b.addedAt).compareTo(DateTime.parse(a.addedAt)));
+      case filterContactMenu.latest:
+        UpdatedList.sort((a, b) {
+          if (a.addedAt == null && b.addedAt == null) {
+            return 0;
+          } else if (b.addedAt == null) {
+            return -1;
+          } else if (a.addedAt == null) {
+            return 1;
+          } else {
+            return DateTime.parse(b.addedAt!)
+                .compareTo(DateTime.parse(a.addedAt!));
+          }
+        });
         break;
 
-      case filterMenu.oldest:
-        ValidatedList.sort((a, b) =>
-            DateTime.parse(a.addedAt).compareTo(DateTime.parse(b.addedAt)));
+      case filterContactMenu.oldest:
+        UpdatedList.sort((a, b) {
+          if (a.addedAt == null && b.addedAt == null) {
+            return 0;
+          } else if (b.addedAt == null) {
+            return -1;
+          } else if (a.addedAt == null) {
+            return 1;
+          } else {
+            return a.addedAt!.compareTo(b.addedAt!);
+          }
+        });
         break;
 
-      case filterMenu.alphabetic:
+      case filterContactMenu.alphabetic:
       default:
-        ValidatedList.sort(
+        UpdatedList.sort(
           (a, b) => a.username.compareTo(b.username),
         );
         break;
     }
 
-    updateListToPrefs("Contacts", ValidatedList);
+    updateListToPrefs("Contacts", UpdatedList);
     setState(() {});
   }
 
@@ -89,23 +115,22 @@ class _ContactsState extends State<ContactsList> {
           children: [
             Row(
               children: [
-                FilterPopupMenu(
-                  onChange: onFilterChange,
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      SwipeUpPageRouteBuilder(
-                        const AddContactScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(
-                    Ionicons.add_outline,
-                    size: 24,
+                FilterPopupMenu(onChange: onFilterChange, type: "Contact"),
+                if (widget.showAddButton)
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        SwipeUpPageRouteBuilder(
+                          const AddContactScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(
+                      Ionicons.add_outline,
+                      size: 24,
+                    ),
                   ),
-                ),
               ],
             ),
             SizedBox(
@@ -140,14 +165,16 @@ class _ContactsState extends State<ContactsList> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                if (ValidatedList.isNotEmpty)
-                  for (var data in ValidatedList)
+                if (UpdatedList.isNotEmpty)
+                  for (var data in UpdatedList)
                     ContactListCard(
                       id: data.id,
                       username: data.username,
                       avatarURL: data.avatarURL,
                       nickname: data.nickname,
                       lastChatAt: data.lastChatAt,
+                      showActions: widget.showActions,
+                      newChat: widget.newChat,
                     )
                 else
                   const Padding(

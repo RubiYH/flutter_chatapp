@@ -5,11 +5,12 @@ import 'package:flutter_chatapp/components/CircleRippleButton.dart';
 import 'package:flutter_chatapp/components/CommonAppBar.dart';
 import 'package:flutter_chatapp/components/ContactListCard.dart';
 import 'package:flutter_chatapp/globals.dart';
-import 'package:flutter_chatapp/models/user_model.dart';
+import 'package:flutter_chatapp/models/user_contact_model.dart';
 import 'package:flutter_chatapp/modules/getListFromPrefs_module.dart';
 import 'package:flutter_chatapp/modules/updateListToPrefs_module.dart';
 import 'package:flutter_chatapp/screens/chat_screen.dart';
 import 'package:flutter_chatapp/screens/edit_contact_screen.dart';
+import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,8 +28,8 @@ class ContactDetailScreen extends StatefulWidget {
 }
 
 class _ContactDetailScreenState extends State<ContactDetailScreen> {
-  late List<UserModel> ContactsList = [];
-  UserModel? User;
+  late List<UserContactModel> ContactsList = [];
+  UserContactModel? User;
 
   final ScrollController _scrollController = ScrollController();
   final TextEditingController textController = TextEditingController();
@@ -38,7 +39,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
     super.initState();
 
     getListFromPrefs("Contacts", (item) {
-      ContactsList.add(UserModel.fromJson(item));
+      ContactsList.add(UserContactModel.fromJson(item));
     }).then((_) {
       User = ContactsList[ContactsList.indexWhere((u) => u.id == widget.id)];
 
@@ -57,7 +58,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
         ContactsList[ContactsList.indexWhere((u) => u.id == User!.id)].memo =
             textController.text.trim();
 
-        updateListToPrefs("storage", ContactsList);
+        updateListToPrefs("Contacts", ContactsList);
       });
     });
   }
@@ -136,7 +137,34 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       child: Column(
                         children: [
                           const Align(
-                            alignment: Alignment.bottomLeft,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "추가한 날짜",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              User?.addedAt != null
+                                  ? DateFormat("yyyy년 MM월 dd일 hh시 mm분 ss초")
+                                      .format(
+                                      DateTime.parse(User!.addedAt!),
+                                    )
+                                  : "알 수 없음.",
+                              style: const TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          const Align(
+                            alignment: Alignment.centerLeft,
                             child: Text(
                               "메모",
                               style: TextStyle(

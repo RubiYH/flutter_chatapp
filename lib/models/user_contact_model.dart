@@ -1,10 +1,10 @@
-class UserModel {
+class UserContactModel {
   final String id;
   String username;
   String? nickname, avatarURL, lastChatAt, memo;
-  String addedAt;
+  String? addedAt;
 
-  UserModel.fromJson(Map<String, dynamic> json)
+  UserContactModel.fromJson(Map<String, dynamic> json)
       : username = json["username"],
         id = json["id"],
         nickname = json["nickname"],

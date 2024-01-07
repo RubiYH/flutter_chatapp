@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/components/ChatListCard.dart';
+import 'package:flutter_chatapp/components/FilterPopUpMenu.dart';
+import 'package:flutter_chatapp/components/SwipeUpPageRouteBuilder.dart';
+import 'package:flutter_chatapp/models/user_chatListCard_model.dart';
+import 'package:flutter_chatapp/modules/getListFromPrefs_module.dart';
+import 'package:flutter_chatapp/modules/updateListToPrefs_module.dart';
+import 'package:flutter_chatapp/screens/add_group_chat_screen.dart';
+import 'package:flutter_chatapp/screens/add_single_chat_screen.dart';
 import 'package:ionicons/ionicons.dart';
 
 class ChatsList extends StatefulWidget {
@@ -11,6 +18,80 @@ class ChatsList extends StatefulWidget {
 
 class _ChatListsState extends State<ChatsList> {
   final _focusNode = FocusNode();
+  final TextEditingController textController = TextEditingController();
+
+  late List<UserChatListCardModel> UpdatedList = [];
+  late List<UserChatListCardModel> ChatsList = [];
+  late List<UserChatListCardModel> SearchList = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (ChatsList.isEmpty) {
+      getListFromPrefs("ChatsList", (item) {
+        ChatsList.add(UserChatListCardModel.fromJson(item));
+      }).then((_) {
+        UpdatedList = ChatsList;
+        setState(() {});
+      }).then((_) {
+        textController.addListener(() {
+          var searchValue = textController.text.trim();
+
+          if (searchValue.isEmpty) {
+            UpdatedList = ChatsList;
+            return;
+          }
+
+          SearchList = ChatsList.where((u) =>
+                  u.username.toLowerCase().contains(searchValue.toLowerCase()))
+              .toList();
+          UpdatedList = SearchList;
+
+          setState(() {});
+        });
+      });
+    }
+  }
+
+  void onFilterChange(item) {
+    switch (item) {
+      case filterChatMenu.latest:
+        UpdatedList.sort((a, b) {
+          if (a.rawlastChatAt == null && b.rawlastChatAt == null) {
+            return 0;
+          } else if (b.rawlastChatAt == null) {
+            return -1;
+          } else if (a.rawlastChatAt == null) {
+            return 1;
+          } else {
+            return DateTime.parse(b.rawlastChatAt!)
+                .compareTo(DateTime.parse(a.rawlastChatAt!));
+          }
+        });
+        break;
+
+      case filterChatMenu.unread:
+        UpdatedList.sort((a, b) {
+          if (a.unreads == null && b.unreads == null) {
+            return 0;
+          } else {
+            return b.unreads.compareTo(a.unreads);
+          }
+        });
+        break;
+
+      case filterChatMenu.alphabetic:
+      default:
+        UpdatedList.sort(
+          (a, b) => a.username.compareTo(b.username),
+        );
+        break;
+    }
+
+    updateListToPrefs("ChatsList", ChatsList);
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +102,111 @@ class _ChatListsState extends State<ChatsList> {
           children: [
             Row(
               children: [
+                FilterPopupMenu(onChange: onFilterChange, type: "Chat"),
                 IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Ionicons.filter_outline,
-                    size: 24,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (ctx) {
+                        return AlertDialog(
+                          contentPadding: EdgeInsets.zero,
+                          backgroundColor: Colors.white,
+                          surfaceTintColor: Colors.white,
+                          scrollable: true,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          content: Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: InkWell(
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(24),
+                                    bottomLeft: Radius.circular(24),
+                                  ),
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    Navigator.push(
+                                      context,
+                                      SwipeUpPageRouteBuilder(
+                                        const AddSingleChat(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 28,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          "1:1 채팅",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 16,
+                                        ),
+                                        Icon(
+                                          Ionicons.chatbubble_outline,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: InkWell(
+                                  borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(24),
+                                    bottomRight: Radius.circular(24),
+                                  ),
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    Navigator.push(
+                                      context,
+                                      SwipeUpPageRouteBuilder(
+                                        const AddGroupChat(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 28,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          "그룹 채팅",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 16,
+                                        ),
+                                        Icon(
+                                          Ionicons.chatbubbles_outline,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                   icon: const Icon(
                     Ionicons.add_outline,
                     size: 24,
@@ -41,6 +218,7 @@ class _ChatListsState extends State<ChatsList> {
               width: 180,
               height: 40,
               child: TextField(
+                controller: textController,
                 focusNode: _focusNode,
                 cursorHeight: 20,
                 autocorrect: false,
@@ -66,61 +244,46 @@ class _ChatListsState extends State<ChatsList> {
         const SizedBox(
           height: 10,
         ),
-        const Expanded(
+        Expanded(
           child: SingleChildScrollView(
             child: Column(
               children: [
-                ChatListCard(
-                  username: "Username",
-                  sentAt: "1 min ago",
-                  unread: 1,
-                ),
-                ChatListCard(
-                  username: "Usernameweweweweewewewewewe",
-                  sentAt: "1 min ago",
-                  message: "dsdsdsdsdsdsdsdsdsdsdsdsddsddsdssdsdsdsdsdsd",
-                  unread: 1,
-                ),
-                ChatListCard(
-                  username: "Username",
-                  sentAt: "1 min ago",
-                  unread: 1,
-                ),
-                ChatListCard(
-                  username: "Username",
-                  sentAt: "1 min ago",
-                  unread: 1,
-                ),
-                ChatListCard(
-                  username: "Username",
-                  sentAt: "1 min ago",
-                  unread: 1,
-                ),
-                ChatListCard(
-                  username: "Username",
-                  sentAt: "1 min ago",
-                  unread: 1,
-                ),
-                ChatListCard(
-                  username: "Username",
-                  sentAt: "1 min ago",
-                  unread: 1,
-                ),
-                ChatListCard(
-                  username: "Username",
-                  sentAt: "1 min ago",
-                  unread: 1,
-                ),
-                ChatListCard(
-                  username: "Username",
-                  sentAt: "1 min ago",
-                  unread: 1,
-                ),
-                ChatListCard(
-                  username: "Username",
-                  sentAt: "1 min ago",
-                  unread: 1,
-                ),
+                if (UpdatedList.isNotEmpty)
+                  for (var data in UpdatedList)
+                    ChatListCard(
+                      username: data.username,
+                      id: data.id,
+                      avatarURL: data.avatarURL,
+                      lastMessage: data.lastMessage,
+                      lastChatAt: data.lastChatAt,
+                      unreads: data.unreads,
+                    )
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "메시지가 없습니다.",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        if (ChatsList.isEmpty)
+                          const Text(
+                            "+ 아이콘을 눌러 채팅을 시작하세요.",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                      ],
+                    ),
+                  )
               ],
             ),
           ),

@@ -10,6 +10,7 @@ import 'package:ionicons/ionicons.dart';
 class ContactListCard extends StatelessWidget {
   final String username, id;
   final String? avatarURL, nickname, lastChatAt;
+  final bool showActions, newChat;
 
   const ContactListCard({
     super.key,
@@ -18,6 +19,8 @@ class ContactListCard extends StatelessWidget {
     this.nickname,
     this.avatarURL,
     this.lastChatAt,
+    this.showActions = true,
+    this.newChat = false,
   });
 
   @override
@@ -33,12 +36,27 @@ class ContactListCard extends StatelessWidget {
         elevation: 0,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            Navigator.push(
-                context,
-                SwipeUpPageRouteBuilder(
-                    ContactDetailScreen(username: username, id: id)));
-          },
+          onTap: newChat
+              ? () => Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(username: username),
+                    ),
+                    ModalRoute.withName(
+                      Navigator.defaultRouteName,
+                    ),
+                  )
+              : () {
+                  Navigator.push(
+                    context,
+                    SwipeUpPageRouteBuilder(
+                      ContactDetailScreen(
+                        username: username,
+                        id: id,
+                      ),
+                    ),
+                  );
+                },
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -104,24 +122,31 @@ class ContactListCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const VerticalDivider(
-                  width: 20,
-                ),
-                InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(username: username),
+                if (showActions)
+                  Row(
+                    children: [
+                      const VerticalDivider(
+                        width: 20,
                       ),
-                    );
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(Icons.messenger_outline_rounded, size: 20),
-                  ),
-                )
+                      InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ChatScreen(username: username),
+                            ),
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child:
+                              Icon(Icons.messenger_outline_rounded, size: 20),
+                        ),
+                      ),
+                    ],
+                  )
               ],
             ),
           ),

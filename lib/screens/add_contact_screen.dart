@@ -4,7 +4,7 @@ import 'package:flutter_chatapp/components/CommonAppBar.dart';
 import 'package:flutter_chatapp/components/SwipeUpPageRouteBuilder.dart';
 import 'package:flutter_chatapp/globals.dart';
 import 'package:flutter_chatapp/main.dart';
-import 'package:flutter_chatapp/models/user_model.dart';
+import 'package:flutter_chatapp/models/user_contact_model.dart';
 import 'package:flutter_chatapp/modules/getListFromPrefs_module.dart';
 import 'package:flutter_chatapp/modules/updateListToPrefs_module.dart';
 import 'package:flutter_chatapp/modules/validateUserID.dart';
@@ -28,15 +28,15 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
   String? errorText;
 
-  late List<UserModel> ContactsList = [];
-  late UserModel newContactsList;
+  late List<UserContactModel> ContactsList = [];
+  late UserContactModel newContactsList;
 
   @override
   void initState() {
     super.initState();
 
     getListFromPrefs("Contacts", (item) {
-      ContactsList.add(UserModel.fromJson(item));
+      ContactsList.add(UserContactModel.fromJson(item));
     }).then((_) => {});
   }
 
@@ -58,7 +58,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                   case true:
                     showDialog(
                       context: context,
-                      barrierDismissible: false,
+                      barrierDismissible: true,
                       builder: (ctx) {
                         return AlertDialog(
                           backgroundColor: Colors.white,
@@ -118,8 +118,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                       "addedAt": DateTime.now().toString()
                                     };
 
-                                    ContactsList.add(
-                                        UserModel.fromJson(newContactsList));
+                                    ContactsList.add(UserContactModel.fromJson(
+                                        newContactsList));
 
                                     updateListToPrefs("Contacts", ContactsList)
                                         .then((_) {

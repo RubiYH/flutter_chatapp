@@ -3,21 +3,26 @@ import 'package:flutter_chatapp/globals.dart';
 import 'package:flutter_chatapp/screens/chat_screen.dart';
 
 class ChatListCard extends StatelessWidget {
-  final String username, message, sentAt, avatarURL;
-  final int unread;
+  final String username, id;
+  final String? lastMessage, lastChatAt, avatarURL;
+  final int unreads;
 
-  const ChatListCard(
-      {super.key,
-      required this.username,
-      this.message = "메시지가 없습니다.",
-      required this.sentAt,
-      this.unread = 0,
-      this.avatarURL = globals_default_avatar});
+  const ChatListCard({
+    super.key,
+    required this.username,
+    required this.id,
+    this.avatarURL = globals_default_avatar,
+    this.lastMessage,
+    this.lastChatAt,
+    this.unreads = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 140,
+    return Container(
+      constraints: const BoxConstraints(
+        minHeight: 130,
+      ),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -48,20 +53,19 @@ class ChatListCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           CircleAvatar(
-                            backgroundImage: NetworkImage(avatarURL),
-                            radius: 16,
+                            backgroundImage: NetworkImage(
+                                avatarURL ?? globals_default_avatar),
+                            radius: 18,
                           ),
                           const SizedBox(
                             width: 10,
                           ),
-                          Flexible(
-                            child: Text(
-                              username,
-                              style: const TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w500,
-                                  overflow: TextOverflow.ellipsis),
-                            ),
+                          Text(
+                            username,
+                            style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w500,
+                                overflow: TextOverflow.ellipsis),
                           ),
                         ],
                       ),
@@ -77,7 +81,7 @@ class ChatListCard extends StatelessWidget {
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            unread.toString(),
+                            unreads.toString(),
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -90,22 +94,25 @@ class ChatListCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 5,
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    message,
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        overflow: TextOverflow.ellipsis),
+                    lastMessage ?? "",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w400,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 2,
                   ),
                 ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    sentAt,
+                    lastChatAt ?? "",
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w300,
