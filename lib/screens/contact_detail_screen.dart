@@ -6,8 +6,8 @@ import 'package:flutter_chatapp/components/CommonAppBar.dart';
 import 'package:flutter_chatapp/components/ContactListCard.dart';
 import 'package:flutter_chatapp/globals.dart';
 import 'package:flutter_chatapp/models/user_model.dart';
-import 'package:flutter_chatapp/modules/getContact_module.dart';
-import 'package:flutter_chatapp/modules/updateContact_module.dart';
+import 'package:flutter_chatapp/modules/getListFromPrefs_module.dart';
+import 'package:flutter_chatapp/modules/updateListToPrefs_module.dart';
 import 'package:flutter_chatapp/screens/chat_screen.dart';
 import 'package:flutter_chatapp/screens/edit_contact_screen.dart';
 import 'package:ionicons/ionicons.dart';
@@ -37,7 +37,9 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
   void initState() {
     super.initState();
 
-    getContact(ContactsList).then((_) {
+    getListFromPrefs("Contacts", (item) {
+      ContactsList.add(UserModel.fromJson(item));
+    }).then((_) {
       User = ContactsList[ContactsList.indexWhere((u) => u.id == widget.id)];
 
       setState(() {});
@@ -55,7 +57,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
         ContactsList[ContactsList.indexWhere((u) => u.id == User!.id)].memo =
             textController.text.trim();
 
-        updateContact(ContactsList);
+        updateListToPrefs("storage", ContactsList);
       });
     });
   }
@@ -64,6 +66,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CommonAppBar(),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -115,6 +118,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                         CircleRippleButton(
                           destination: ChatScreen(username: User!.username),
                           icon: const Icon(Icons.messenger_outline_rounded),
+                          noHistory: true,
                         ),
                         const SizedBox(width: 20),
                         CircleRippleButton(

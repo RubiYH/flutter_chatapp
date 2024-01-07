@@ -2,6 +2,7 @@ class UserModel {
   final String id;
   String username;
   String? nickname, avatarURL, lastChatAt, memo;
+  String addedAt;
 
   UserModel.fromJson(Map<String, dynamic> json)
       : username = json["username"],
@@ -9,7 +10,8 @@ class UserModel {
         nickname = json["nickname"],
         avatarURL = json["avatarURL"],
         lastChatAt = json["lastChatAt"],
-        memo = json["memo"];
+        memo = json["memo"],
+        addedAt = json["addedAt"];
 
   Map<String, dynamic> toJson() => {
         'username': username,
@@ -18,5 +20,6 @@ class UserModel {
         'avatarURL': avatarURL,
         'lastChatAt': lastChatAt,
         "memo": memo,
+        "addedAt": addedAt
       };
 }

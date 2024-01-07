@@ -74,9 +74,9 @@ class _AppState extends State<App> {
                 child: IndexedStack(
                   index: _index,
                   children: const [
-                    SingleChildScrollView(child: ChatsList()),
-                    SingleChildScrollView(child: ContactsList()),
-                    SingleChildScrollView(child: MyAccount()),
+                    ChatsList(),
+                    ContactsList(),
+                    MyAccount(),
                   ],
                 ),
               ),

@@ -63,63 +63,67 @@ class _ChatListsState extends State<ChatsList> {
             ),
           ],
         ),
-        const Column(
-          children: [
-            SizedBox(
-              height: 20,
+        const SizedBox(
+          height: 10,
+        ),
+        const Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                ChatListCard(
+                  username: "Username",
+                  sentAt: "1 min ago",
+                  unread: 1,
+                ),
+                ChatListCard(
+                  username: "Usernameweweweweewewewewewe",
+                  sentAt: "1 min ago",
+                  message: "dsdsdsdsdsdsdsdsdsdsdsdsddsddsdssdsdsdsdsdsd",
+                  unread: 1,
+                ),
+                ChatListCard(
+                  username: "Username",
+                  sentAt: "1 min ago",
+                  unread: 1,
+                ),
+                ChatListCard(
+                  username: "Username",
+                  sentAt: "1 min ago",
+                  unread: 1,
+                ),
+                ChatListCard(
+                  username: "Username",
+                  sentAt: "1 min ago",
+                  unread: 1,
+                ),
+                ChatListCard(
+                  username: "Username",
+                  sentAt: "1 min ago",
+                  unread: 1,
+                ),
+                ChatListCard(
+                  username: "Username",
+                  sentAt: "1 min ago",
+                  unread: 1,
+                ),
+                ChatListCard(
+                  username: "Username",
+                  sentAt: "1 min ago",
+                  unread: 1,
+                ),
+                ChatListCard(
+                  username: "Username",
+                  sentAt: "1 min ago",
+                  unread: 1,
+                ),
+                ChatListCard(
+                  username: "Username",
+                  sentAt: "1 min ago",
+                  unread: 1,
+                ),
+              ],
             ),
-            ChatListCard(
-              username: "Username",
-              sentAt: "1 min ago",
-              unread: 1,
-            ),
-            ChatListCard(
-              username: "Usernameweweweweewewewewewe",
-              sentAt: "1 min ago",
-              message: "dsdsdsdsdsdsdsdsdsdsdsdsddsddsdssdsdsdsdsdsd",
-              unread: 1,
-            ),
-            ChatListCard(
-              username: "Username",
-              sentAt: "1 min ago",
-              unread: 1,
-            ),
-            ChatListCard(
-              username: "Username",
-              sentAt: "1 min ago",
-              unread: 1,
-            ),
-            ChatListCard(
-              username: "Username",
-              sentAt: "1 min ago",
-              unread: 1,
-            ),
-            ChatListCard(
-              username: "Username",
-              sentAt: "1 min ago",
-              unread: 1,
-            ),
-            ChatListCard(
-              username: "Username",
-              sentAt: "1 min ago",
-              unread: 1,
-            ),
-            ChatListCard(
-              username: "Username",
-              sentAt: "1 min ago",
-              unread: 1,
-            ),
-            ChatListCard(
-              username: "Username",
-              sentAt: "1 min ago",
-              unread: 1,
-            ),
-            ChatListCard(
-              username: "Username",
-              sentAt: "1 min ago",
-              unread: 1,
-            ),
-          ],
+          ),
         )
       ],
     );

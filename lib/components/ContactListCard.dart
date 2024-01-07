@@ -28,7 +28,7 @@ class ContactListCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        color: Colors.white60,
+        color: Colors.white,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         child: InkWell(

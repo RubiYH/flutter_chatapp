@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_chatapp/components/ContactListCard.dart';
+import 'package:flutter_chatapp/components/FilterPopUpMenu.dart';
 import 'package:flutter_chatapp/components/SwipeUpPageRouteBuilder.dart';
 import 'package:flutter_chatapp/models/user_model.dart';
-import 'package:flutter_chatapp/modules/getContact_module.dart';
+import 'package:flutter_chatapp/modules/getListFromPrefs_module.dart';
+import 'package:flutter_chatapp/modules/updateListToPrefs_module.dart';
 import 'package:flutter_chatapp/screens/add_contact_screen.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,7 +31,9 @@ class _ContactsState extends State<ContactsList> {
     super.initState();
 
     if (ContactsList.isEmpty) {
-      getContact(ContactsList).then((_) {
+      getListFromPrefs("Contacts", (item) {
+        ContactsList.add(UserModel.fromJson(item));
+      }).then((_) {
         ValidatedList = ContactsList;
         setState(() {});
       }).then((_) {
@@ -52,6 +56,30 @@ class _ContactsState extends State<ContactsList> {
     }
   }
 
+  void onFilterChange(filterMenu item) {
+    switch (item) {
+      case filterMenu.latest:
+        ValidatedList.sort((a, b) =>
+            DateTime.parse(b.addedAt).compareTo(DateTime.parse(a.addedAt)));
+        break;
+
+      case filterMenu.oldest:
+        ValidatedList.sort((a, b) =>
+            DateTime.parse(a.addedAt).compareTo(DateTime.parse(b.addedAt)));
+        break;
+
+      case filterMenu.alphabetic:
+      default:
+        ValidatedList.sort(
+          (a, b) => a.username.compareTo(b.username),
+        );
+        break;
+    }
+
+    updateListToPrefs("Contacts", ValidatedList);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -61,12 +89,8 @@ class _ContactsState extends State<ContactsList> {
           children: [
             Row(
               children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Ionicons.filter_outline,
-                    size: 24,
-                  ),
+                FilterPopupMenu(
+                  onChange: onFilterChange,
                 ),
                 IconButton(
                   onPressed: () {
@@ -110,31 +134,35 @@ class _ContactsState extends State<ContactsList> {
           ],
         ),
         const SizedBox(
-          height: 20,
+          height: 10,
         ),
-        Column(
-          children: [
-            if (ValidatedList.isNotEmpty)
-              for (var data in ValidatedList)
-                ContactListCard(
-                  id: data.id,
-                  username: data.username,
-                  avatarURL: data.avatarURL,
-                  nickname: data.nickname,
-                  lastChatAt: data.lastChatAt,
-                )
-            else
-              const Padding(
-                padding: EdgeInsets.only(top: 12),
-                child: Text(
-                  "연락처가 없습니다.",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              )
-          ],
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                if (ValidatedList.isNotEmpty)
+                  for (var data in ValidatedList)
+                    ContactListCard(
+                      id: data.id,
+                      username: data.username,
+                      avatarURL: data.avatarURL,
+                      nickname: data.nickname,
+                      lastChatAt: data.lastChatAt,
+                    )
+                else
+                  const Padding(
+                    padding: EdgeInsets.only(top: 12),
+                    child: Text(
+                      "연락처가 없습니다.",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )
+              ],
+            ),
+          ),
         )
       ],
     );

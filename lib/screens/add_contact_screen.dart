@@ -5,8 +5,8 @@ import 'package:flutter_chatapp/components/SwipeUpPageRouteBuilder.dart';
 import 'package:flutter_chatapp/globals.dart';
 import 'package:flutter_chatapp/main.dart';
 import 'package:flutter_chatapp/models/user_model.dart';
-import 'package:flutter_chatapp/modules/getContact_module.dart';
-import 'package:flutter_chatapp/modules/updateContact_module.dart';
+import 'package:flutter_chatapp/modules/getListFromPrefs_module.dart';
+import 'package:flutter_chatapp/modules/updateListToPrefs_module.dart';
 import 'package:flutter_chatapp/modules/validateUserID.dart';
 import 'package:flutter_chatapp/screens/contactsList_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -35,7 +35,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
   void initState() {
     super.initState();
 
-    getContact(ContactsList).then((_) => {});
+    getListFromPrefs("Contacts", (item) {
+      ContactsList.add(UserModel.fromJson(item));
+    }).then((_) => {});
   }
 
   @override
@@ -113,12 +115,14 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                       "avatarURL": validatedData["avatarURL"],
                                       "lastChatAt": null,
                                       "memo": null,
+                                      "addedAt": DateTime.now().toString()
                                     };
 
                                     ContactsList.add(
                                         UserModel.fromJson(newContactsList));
 
-                                    updateContact(ContactsList).then((_) {
+                                    updateListToPrefs("Contacts", ContactsList)
+                                        .then((_) {
                                       setState(() {});
                                     });
 
