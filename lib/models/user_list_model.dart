@@ -1,16 +1,14 @@
-class UserContactModel {
+class UsersListModel {
   final String id;
   String username;
-  String? nickname, avatarURL, lastChatAt, memo;
-  String? addedAt;
+  String? nickname, avatarURL, lastChatAt, addedAt;
 
-  UserContactModel.fromJson(Map<String, dynamic> json)
+  UsersListModel.fromJson(Map<String, dynamic> json)
       : username = json["username"],
         id = json["id"],
         nickname = json["nickname"],
         avatarURL = json["avatarURL"],
         lastChatAt = json["lastChatAt"],
-        memo = json["memo"],
         addedAt = json["addedAt"];
 
   Map<String, dynamic> toJson() => {
@@ -19,7 +17,6 @@ class UserContactModel {
         'nickname': nickname,
         'avatarURL': avatarURL,
         'lastChatAt': lastChatAt,
-        "memo": memo,
         "addedAt": addedAt
       };
 }

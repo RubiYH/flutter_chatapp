@@ -6,15 +6,11 @@ import 'package:flutter_chatapp/screens/myaccount_screen.dart';
 import 'package:ionicons/ionicons.dart';
 
 void main() {
-  runApp(const App(
-    index: 0,
-  ));
+  runApp(const App());
 }
 
 class App extends StatefulWidget {
-  final int index;
-
-  const App({super.key, this.index = 0});
+  const App({super.key});
 
   @override
   State<App> createState() => _AppState();
@@ -27,14 +23,13 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    _index = widget.index;
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: const Color.fromRGBO(255, 255, 255, 0.95),
+        backgroundColor: const Color(0xffefefef),
         appBar: AppBar(
           systemOverlayStyle: const SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,

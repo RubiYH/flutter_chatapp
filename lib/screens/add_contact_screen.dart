@@ -4,7 +4,8 @@ import 'package:flutter_chatapp/components/CommonAppBar.dart';
 import 'package:flutter_chatapp/components/SwipeUpPageRouteBuilder.dart';
 import 'package:flutter_chatapp/globals.dart';
 import 'package:flutter_chatapp/main.dart';
-import 'package:flutter_chatapp/models/user_contact_model.dart';
+import 'package:flutter_chatapp/models/user_memo_model.dart';
+import 'package:flutter_chatapp/models/user_list_model.dart';
 import 'package:flutter_chatapp/modules/getListFromPrefs_module.dart';
 import 'package:flutter_chatapp/modules/updateListToPrefs_module.dart';
 import 'package:flutter_chatapp/modules/validateUserID.dart';
@@ -13,7 +14,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ionicons/ionicons.dart';
 
 class AddContactScreen extends StatefulWidget {
-  const AddContactScreen({super.key});
+  final Function afterAdded;
+
+  const AddContactScreen({
+    super.key,
+    required this.afterAdded,
+  });
 
   @override
   State<AddContactScreen> createState() => _AddContactScreenState();
@@ -28,16 +34,26 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
   String? errorText;
 
-  late List<UserContactModel> ContactsList = [];
-  late UserContactModel newContactsList;
+  List<UserMemoModel> MemoList = [];
+  late UserMemoModel newMemoList;
+
+  List<UsersListModel> UsersList = [];
+  late UsersListModel newUsersList;
 
   @override
   void initState() {
     super.initState();
+    getData();
+  }
 
-    getListFromPrefs("Contacts", (item) {
-      ContactsList.add(UserContactModel.fromJson(item));
-    }).then((_) => {});
+  getData() async {
+    await getListFromPrefs("Memo", (item) {
+      MemoList.add(UserMemoModel.fromJson(item));
+    });
+
+    await getListFromPrefs("Users", (item) {
+      UsersList.add(UsersListModel.fromJson(item));
+    });
   }
 
   @override
@@ -103,8 +119,27 @@ class _AddContactScreenState extends State<AddContactScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 TextButton(
-                                  onPressed: () {
-                                    Map<String, dynamic> newContactsList = {
+                                  onPressed: () async {
+                                    var createdAt = DateTime.now().toString();
+
+                                    Map<String, dynamic> newMemoList = {
+                                      "username": nameText.text.isEmpty
+                                          ? validatedData["username"]
+                                          : nameText.text,
+                                      "id": validatedData["id"],
+                                      "nickname": nicknameText.text.isEmpty
+                                          ? null
+                                          : nicknameText.text,
+                                      "memo": null,
+                                    };
+
+                                    MemoList.add(UserMemoModel.fromJson(
+                                      newMemoList,
+                                    ));
+
+                                    await updateListToPrefs("Memo", MemoList);
+
+                                    Map<String, dynamic> newUsersList = {
                                       "username": nameText.text.isEmpty
                                           ? validatedData["username"]
                                           : nameText.text,
@@ -114,17 +149,16 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                           : nicknameText.text,
                                       "avatarURL": validatedData["avatarURL"],
                                       "lastChatAt": null,
-                                      "memo": null,
-                                      "addedAt": DateTime.now().toString()
+                                      "addedAt": createdAt
                                     };
 
-                                    ContactsList.add(UserContactModel.fromJson(
-                                        newContactsList));
+                                    UsersList.add(UsersListModel.fromJson(
+                                      newUsersList,
+                                    ));
 
-                                    updateListToPrefs("Contacts", ContactsList)
-                                        .then((_) {
-                                      setState(() {});
-                                    });
+                                    await updateListToPrefs("Users", UsersList);
+
+                                    await widget.afterAdded();
 
                                     Fluttertoast.showToast(
                                       msg: "연락처를 추가하였습니다.",
@@ -132,11 +166,11 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                       toastLength: Toast.LENGTH_SHORT,
                                     );
 
-                                    Navigator.of(ctx).pushAndRemoveUntil(
-                                      SwipeUpPageRouteBuilder(
-                                          const App(index: 1)),
-                                      (route) => false,
-                                    );
+                                    if (ctx.mounted) {
+                                      Navigator.of(ctx).popUntil(
+                                        (route) => route.isFirst,
+                                      );
+                                    }
                                   },
                                   child: const Text("추가"),
                                 ),
@@ -215,7 +249,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
         }
         return null;
       },
-      inputFormatters: [FilteringTextInputFormatter.deny(RegExp('[ ]'))],
+      inputFormatters:
+          required ? [FilteringTextInputFormatter.deny(RegExp('[ ]'))] : null,
       controller: controller,
       decoration: InputDecoration(
         border: OutlineInputBorder(

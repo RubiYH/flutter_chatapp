@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chatapp/main.dart';
 import 'package:ionicons/ionicons.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -20,7 +21,11 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: IconButton(
         icon: const Icon(Ionicons.chevron_back_outline),
         onPressed: () {
-          Navigator.of(context).pop();
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          } else {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          }
         },
       ),
       title: (title != null)

@@ -5,7 +5,8 @@ import 'package:flutter_chatapp/components/CircleRippleButton.dart';
 import 'package:flutter_chatapp/components/CommonAppBar.dart';
 import 'package:flutter_chatapp/components/ContactListCard.dart';
 import 'package:flutter_chatapp/globals.dart';
-import 'package:flutter_chatapp/models/user_contact_model.dart';
+import 'package:flutter_chatapp/models/user_list_model.dart';
+import 'package:flutter_chatapp/models/user_memo_model.dart';
 import 'package:flutter_chatapp/modules/getListFromPrefs_module.dart';
 import 'package:flutter_chatapp/modules/updateListToPrefs_module.dart';
 import 'package:flutter_chatapp/screens/chat_screen.dart';
@@ -28,39 +29,55 @@ class ContactDetailScreen extends StatefulWidget {
 }
 
 class _ContactDetailScreenState extends State<ContactDetailScreen> {
-  late List<UserContactModel> ContactsList = [];
-  UserContactModel? User;
+  late List<UserMemoModel> MemoList = [];
+  UserMemoModel? Memo;
+  late List<UsersListModel> UsersList = [];
+  UsersListModel? User;
 
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController textController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+  }
 
-    getListFromPrefs("Contacts", (item) {
-      ContactsList.add(UserContactModel.fromJson(item));
+  getData() async {
+    await getListFromPrefs("Users", (item) {
+      UsersList.add(UsersListModel.fromJson(item));
     }).then((_) {
-      User = ContactsList[ContactsList.indexWhere((u) => u.id == widget.id)];
-
-      setState(() {});
-    }).then((_) {
-      final String? getMemo = User?.memo;
-
-      if (getMemo != null) {
-        textController.text = getMemo;
-      }
-    }).then((_) {
-      textController.addListener(() {
-        if (User?.memo == null && textController.text.trim().isEmpty ||
-            User?.memo == textController.text.trim()) return;
-
-        ContactsList[ContactsList.indexWhere((u) => u.id == User!.id)].memo =
-            textController.text.trim();
-
-        updateListToPrefs("Contacts", ContactsList);
-      });
+      User = UsersList[UsersList.indexWhere((u) => u.id == widget.id)];
     });
+
+    await getListFromPrefs("Memo", (item) {
+      MemoList.add(UserMemoModel.fromJson(item));
+    });
+
+    Memo = MemoList[MemoList.indexWhere((u) => u.id == widget.id)];
+
+    final String? getMemo = Memo?.memo;
+
+    if (getMemo != null) {
+      _textController.text = getMemo;
+    }
+
+    _textController.addListener(() {
+      if (Memo?.memo == null && _textController.text.trim().isEmpty ||
+          Memo?.memo == _textController.text.trim()) return;
+
+      MemoList[MemoList.indexWhere((u) => u.id == User!.id)].memo =
+          _textController.text.trim();
+
+      updateListToPrefs("Memo", MemoList);
+    });
+
+    return {User, Memo};
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _textController.dispose();
   }
 
   @override
@@ -71,8 +88,11 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: User != null
-              ? Column(
+          child: FutureBuilder(
+            future: getData(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
                   children: [
                     CircleAvatar(
                       backgroundImage: NetworkImage(
@@ -93,7 +113,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       height: 5,
                     ),
                     Text(
-                      User!.id,
+                      "@${User!.id}",
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -178,7 +198,7 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                           ),
                           Scrollbar(
                             child: TextField(
-                              controller: textController,
+                              controller: _textController,
                               scrollController: _scrollController,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
@@ -192,8 +212,9 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       ),
                     )
                   ],
-                )
-              : const Center(
+                );
+              } else if (snapshot.hasError) {
+                return const Center(
                   child: Text(
                     "연락처 정보가 없습니다.",
                     style: TextStyle(
@@ -201,7 +222,12 @@ class _ContactDetailScreenState extends State<ContactDetailScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
+                );
+              } else {
+                return const CircularProgressIndicator();
+              }
+            },
+          ),
         ),
       ),
     );

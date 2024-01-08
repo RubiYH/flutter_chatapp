@@ -4,11 +4,17 @@ import 'package:flutter_chatapp/components/CommonAppBar.dart';
 import 'package:ionicons/ionicons.dart';
 
 class ChatScreen extends StatefulWidget {
-  final String username;
+  final String? username;
+  final bool isGroup;
+  final List? groupUsers;
+  final String? groupTitle;
 
   const ChatScreen({
     super.key,
-    required this.username,
+    this.username,
+    this.isGroup = false,
+    this.groupUsers,
+    this.groupTitle,
   });
 
   @override
@@ -16,25 +22,25 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final textController = TextEditingController();
+  final _textController = TextEditingController();
   String? inputText;
 
   @override
   void initState() {
     super.initState();
 
-    textController.addListener(_getTextValue);
+    _textController.addListener(_getTextValue);
   }
 
   @override
   void dispose() {
-    textController.dispose();
     super.dispose();
+    _textController.dispose();
   }
 
   void _getTextValue() {
     setState(() {
-      inputText = textController.text.trim();
+      inputText = _textController.text.trim();
     });
   }
 
@@ -46,7 +52,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightBlue.shade100,
-      appBar: CommonAppBar(title: widget.username),
+      appBar: CommonAppBar(
+          title: widget.isGroup ? widget.groupTitle : widget.username),
       body: Column(
         children: [
           Expanded(
@@ -105,7 +112,7 @@ class _ChatScreenState extends State<ChatScreen> {
             alignment: Alignment.bottomCenter,
             children: [
               TextField(
-                controller: textController,
+                controller: _textController,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(
                     borderRadius: BorderRadius.zero,

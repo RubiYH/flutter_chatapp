@@ -18,7 +18,7 @@ class ChatsList extends StatefulWidget {
 
 class _ChatListsState extends State<ChatsList> {
   final _focusNode = FocusNode();
-  final TextEditingController textController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   late List<UserChatListCardModel> UpdatedList = [];
   late List<UserChatListCardModel> ChatsList = [];
@@ -28,30 +28,38 @@ class _ChatListsState extends State<ChatsList> {
   void initState() {
     super.initState();
 
-    if (ChatsList.isEmpty) {
-      getListFromPrefs("ChatsList", (item) {
-        ChatsList.add(UserChatListCardModel.fromJson(item));
-      }).then((_) {
+    _textController.addListener(() {
+      var searchValue = _textController.text.trim();
+
+      if (searchValue.isEmpty) {
         UpdatedList = ChatsList;
-        setState(() {});
-      }).then((_) {
-        textController.addListener(() {
-          var searchValue = textController.text.trim();
+        return;
+      }
 
-          if (searchValue.isEmpty) {
-            UpdatedList = ChatsList;
-            return;
-          }
+      SearchList = ChatsList.where((u) =>
+              u.username.toLowerCase().contains(searchValue.toLowerCase()))
+          .toList();
+      UpdatedList = SearchList;
 
-          SearchList = ChatsList.where((u) =>
-                  u.username.toLowerCase().contains(searchValue.toLowerCase()))
-              .toList();
-          UpdatedList = SearchList;
+      setState(() {});
+    });
+  }
 
-          setState(() {});
-        });
+  @override
+  void dispose() {
+    super.dispose();
+    _textController.dispose();
+  }
+
+  getData() async {
+    if (ChatsList.isEmpty) {
+      await getListFromPrefs("Chats", (item) {
+        ChatsList.add(UserChatListCardModel.fromJson(item));
       });
+      UpdatedList = ChatsList;
     }
+
+    return ChatsList;
   }
 
   void onFilterChange(item) {
@@ -89,7 +97,7 @@ class _ChatListsState extends State<ChatsList> {
         break;
     }
 
-    updateListToPrefs("ChatsList", ChatsList);
+    updateListToPrefs("Chats", ChatsList);
     setState(() {});
   }
 
@@ -102,7 +110,7 @@ class _ChatListsState extends State<ChatsList> {
           children: [
             Row(
               children: [
-                FilterPopupMenu(onChange: onFilterChange, type: "Chat"),
+                FilterPopupMenu(onChange: onFilterChange, type: "ChatsList"),
                 IconButton(
                   onPressed: () {
                     showDialog(
@@ -127,9 +135,9 @@ class _ChatListsState extends State<ChatsList> {
                                     bottomLeft: Radius.circular(24),
                                   ),
                                   onTap: () {
-                                    Navigator.pop(context);
+                                    Navigator.pop(ctx);
                                     Navigator.push(
-                                      context,
+                                      ctx,
                                       SwipeUpPageRouteBuilder(
                                         const AddSingleChat(),
                                       ),
@@ -168,9 +176,9 @@ class _ChatListsState extends State<ChatsList> {
                                     bottomRight: Radius.circular(24),
                                   ),
                                   onTap: () {
-                                    Navigator.pop(context);
+                                    Navigator.pop(ctx);
                                     Navigator.push(
-                                      context,
+                                      ctx,
                                       SwipeUpPageRouteBuilder(
                                         const AddGroupChat(),
                                       ),
@@ -218,7 +226,7 @@ class _ChatListsState extends State<ChatsList> {
               width: 180,
               height: 40,
               child: TextField(
-                controller: textController,
+                controller: _textController,
                 focusNode: _focusNode,
                 cursorHeight: 20,
                 autocorrect: false,
@@ -246,45 +254,64 @@ class _ChatListsState extends State<ChatsList> {
         ),
         Expanded(
           child: SingleChildScrollView(
-            child: Column(
-              children: [
-                if (UpdatedList.isNotEmpty)
-                  for (var data in UpdatedList)
-                    ChatListCard(
-                      username: data.username,
-                      id: data.id,
-                      avatarURL: data.avatarURL,
-                      lastMessage: data.lastMessage,
-                      lastChatAt: data.lastChatAt,
-                      unreads: data.unreads,
-                    )
-                else
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Column(
-                      children: [
-                        const Text(
-                          "메시지가 없습니다.",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
+            child: FutureBuilder(
+              future: getData(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      if (UpdatedList.isNotEmpty)
+                        for (var data in UpdatedList)
+                          ChatListCard(
+                            username: data.username,
+                            id: data.id,
+                            avatarURL: data.avatarURL,
+                            lastMessage: data.lastMessage,
+                            lastChatAt: data.lastChatAt,
+                            unreads: data.unreads,
+                          )
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Column(
+                            children: [
+                              const Text(
+                                "메시지가 없습니다.",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              if (ChatsList.isEmpty)
+                                const Text(
+                                  "+ 아이콘을 눌러 채팅을 시작하세요.",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        if (ChatsList.isEmpty)
-                          const Text(
-                            "+ 아이콘을 눌러 채팅을 시작하세요.",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                      ],
+                        )
+                    ],
+                  );
+                } else if (snapshot.hasError) {
+                  return const Center(
+                    child: Text(
+                      "오류가 발생하였습니다.",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  )
-              ],
+                  );
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
             ),
           ),
         )

@@ -25,8 +25,11 @@ class FilterPopupMenu extends StatefulWidget {
   final Function onChange;
   final String type;
 
-  const FilterPopupMenu(
-      {super.key, required this.onChange, required this.type});
+  const FilterPopupMenu({
+    super.key,
+    required this.onChange,
+    required this.type,
+  });
 
   @override
   State<FilterPopupMenu> createState() => _FilterPopupMenuState();
@@ -39,7 +42,7 @@ class _FilterPopupMenuState extends State<FilterPopupMenu> {
   @override
   Widget build(BuildContext context) {
     switch (widget.type) {
-      case "Contact":
+      case "Contacts":
         return PopupMenuButton<filterContactMenu>(
           icon: const Icon(Ionicons.filter_outline),
           initialValue: selectedContactMenu,
@@ -71,7 +74,7 @@ class _FilterPopupMenuState extends State<FilterPopupMenu> {
           color: Colors.white,
         );
 
-      case "Chat":
+      case "Chats":
       default:
         return PopupMenuButton<filterChatMenu>(
           icon: const Icon(Ionicons.filter_outline),
