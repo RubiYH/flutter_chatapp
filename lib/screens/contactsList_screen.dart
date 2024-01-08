@@ -28,10 +28,10 @@ class ContactsList extends StatefulWidget {
   });
 
   @override
-  State<ContactsList> createState() => ContactsState();
+  State<ContactsList> createState() => _ContactsState();
 }
 
-class ContactsState extends State<ContactsList> {
+class _ContactsState extends State<ContactsList> {
   final _focusNode = FocusNode();
   final TextEditingController _textController = TextEditingController();
 
@@ -39,9 +39,13 @@ class ContactsState extends State<ContactsList> {
   late List<UsersListModel> UsersList = [];
   late List<UsersListModel> SearchList = [];
 
+  late Future<List<UsersListModel>>? FutureList;
+
   @override
   void initState() {
     super.initState();
+
+    FutureList = getData();
 
     _textController.addListener(() {
       var searchValue = _textController.text.trim();
@@ -56,18 +60,24 @@ class ContactsState extends State<ContactsList> {
           .toList();
       UpdatedList = SearchList;
 
-      setState(() {});
+      setState(() {
+        FutureList = getUpdatedList(UpdatedList);
+      });
     });
   }
 
-  Future getData() async {
+  Future<List<UsersListModel>> getUpdatedList(targetList) async {
+    return targetList;
+  }
+
+  Future<List<UsersListModel>> getData() async {
     UsersList = [];
     await getListFromPrefs("Users", (item) {
       UsersList.add(UsersListModel.fromJson(item));
     });
     UpdatedList = UsersList;
 
-    return UsersList;
+    return UpdatedList;
   }
 
   @override
@@ -152,7 +162,7 @@ class ContactsState extends State<ContactsList> {
 
   void afterAdded() {
     setState(() {
-      getData();
+      FutureList = getData();
     });
   }
 
@@ -258,7 +268,7 @@ class ContactsState extends State<ContactsList> {
         Expanded(
           child: SingleChildScrollView(
             child: FutureBuilder(
-              future: getData(),
+              future: FutureList,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Column(

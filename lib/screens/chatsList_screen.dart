@@ -24,9 +24,13 @@ class _ChatListsState extends State<ChatsList> {
   late List<UserChatListCardModel> ChatsList = [];
   late List<UserChatListCardModel> SearchList = [];
 
+  late Future<List<UserChatListCardModel>> FutureList;
+
   @override
   void initState() {
     super.initState();
+
+    FutureList = getData();
 
     _textController.addListener(() {
       var searchValue = _textController.text.trim();
@@ -41,8 +45,14 @@ class _ChatListsState extends State<ChatsList> {
           .toList();
       UpdatedList = SearchList;
 
-      setState(() {});
+      setState(() {
+        FutureList = getUpdatedList(UpdatedList);
+      });
     });
+  }
+
+  Future<List<UserChatListCardModel>> getUpdatedList(targetList) async {
+    return targetList;
   }
 
   @override
@@ -51,15 +61,14 @@ class _ChatListsState extends State<ChatsList> {
     _textController.dispose();
   }
 
-  getData() async {
-    if (ChatsList.isEmpty) {
-      await getListFromPrefs("Chats", (item) {
-        ChatsList.add(UserChatListCardModel.fromJson(item));
-      });
-      UpdatedList = ChatsList;
-    }
+  Future<List<UserChatListCardModel>> getData() async {
+    ChatsList = [];
+    await getListFromPrefs("Chats", (item) {
+      ChatsList.add(UserChatListCardModel.fromJson(item));
+    });
+    UpdatedList = ChatsList;
 
-    return ChatsList;
+    return UpdatedList;
   }
 
   void onFilterChange(item) {
@@ -255,7 +264,7 @@ class _ChatListsState extends State<ChatsList> {
         Expanded(
           child: SingleChildScrollView(
             child: FutureBuilder(
-              future: getData(),
+              future: FutureList,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Column(
