@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chatapp/screens/chatsList_screen.dart';
 import 'package:flutter_chatapp/screens/contactsList_screen.dart';
-import 'package:flutter_chatapp/screens/myaccount_screen.dart';
+import 'package:flutter_chatapp/screens/settings_screen.dart';
 import 'package:ionicons/ionicons.dart';
 
 void main() {
@@ -18,7 +18,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   var _index = 0;
-  static const title = ["채팅", "연락처", "내 계정"];
+  static const title = ["채팅", "연락처", "설정"];
 
   @override
   void initState() {
@@ -71,7 +71,7 @@ class _AppState extends State<App> {
                   children: const [
                     ChatsList(),
                     ContactsList(),
-                    MyAccount(),
+                    Settings(),
                   ],
                 ),
               ),
@@ -97,9 +97,7 @@ class _AppState extends State<App> {
               BottomNavigationBarItem(
                   icon: Icon(Ionicons.people_circle_outline), label: "연락처"),
               BottomNavigationBarItem(
-                icon: Icon(Ionicons.person_circle_outline),
-                label: "내 계정",
-              )
+                  icon: Icon(Ionicons.settings_outline), label: "설정")
             ],
             type: BottomNavigationBarType.fixed,
             unselectedItemColor: Colors.black,

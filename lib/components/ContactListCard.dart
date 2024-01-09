@@ -4,7 +4,6 @@ import 'package:flutter_chatapp/components/SwipeUpPageRouteBuilder.dart';
 import 'package:flutter_chatapp/globals.dart';
 import 'package:flutter_chatapp/screens/chat_screen.dart';
 import 'package:flutter_chatapp/screens/contact_detail_screen.dart';
-import 'package:flutter_chatapp/screens/myaccount_detail_screen.dart';
 import 'package:ionicons/ionicons.dart';
 
 class ContactListCard extends StatefulWidget {
