@@ -52,7 +52,6 @@ class _SettingsState extends State<Settings> {
                 ),
               );
             },
-            borderRadius: BorderRadius.circular(20),
             child: ListTile(
               title: Text(
                 menuData[index]["name"],
