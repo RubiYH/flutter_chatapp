@@ -8,7 +8,7 @@ import 'package:flutter_chatapp/models/user_memo_model.dart';
 import 'package:flutter_chatapp/models/user_list_model.dart';
 import 'package:flutter_chatapp/modules/getListFromPrefs_module.dart';
 import 'package:flutter_chatapp/modules/updateListToPrefs_module.dart';
-import 'package:flutter_chatapp/modules/validateUserID.dart';
+import 'package:flutter_chatapp/modules/addUserByID.dart';
 import 'package:flutter_chatapp/screens/contactsList_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ionicons/ionicons.dart';
@@ -66,11 +66,11 @@ class _AddContactScreenState extends State<AddContactScreen> {
           IconButton(
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
-                final validatedData = await validateUserID(IDText.text);
+                final getUserByID = await addUserByID(IDText.text);
 
                 if (!mounted) return;
 
-                switch (validatedData["status"]) {
+                switch (getUserByID["status"]) {
                   case true:
                     showDialog(
                       context: context,
@@ -97,7 +97,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                     height: 20,
                                   ),
                                   Text(
-                                    validatedData["username"],
+                                    nameText.text.isNotEmpty
+                                        ? nameText.text
+                                        : getUserByID["username"],
                                     style: const TextStyle(fontSize: 20),
                                   ),
                                   const SizedBox(
@@ -105,7 +107,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
                                   ),
                                   CircleAvatar(
                                     backgroundImage: NetworkImage(
-                                      validatedData["avatarURL"] ??
+                                      getUserByID["avatarURL"] ??
                                           globals_default_avatar,
                                     ),
                                     radius: 40,
@@ -124,9 +126,9 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
                                     Map<String, dynamic> newMemoList = {
                                       "username": nameText.text.isEmpty
-                                          ? validatedData["username"]
+                                          ? getUserByID["username"]
                                           : nameText.text,
-                                      "id": validatedData["id"],
+                                      "id": getUserByID["id"],
                                       "nickname": nicknameText.text.isEmpty
                                           ? null
                                           : nicknameText.text,
@@ -141,13 +143,13 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
                                     Map<String, dynamic> newUsersList = {
                                       "username": nameText.text.isEmpty
-                                          ? validatedData["username"]
+                                          ? getUserByID["username"]
                                           : nameText.text,
-                                      "id": validatedData["id"],
+                                      "id": getUserByID["id"],
                                       "nickname": nicknameText.text.isEmpty
                                           ? null
                                           : nicknameText.text,
-                                      "avatarURL": validatedData["avatarURL"],
+                                      "avatarURL": getUserByID["avatarURL"],
                                       "lastChatAt": null,
                                       "addedAt": createdAt
                                     };
@@ -186,6 +188,8 @@ class _AddContactScreenState extends State<AddContactScreen> {
                         );
                       },
                     );
+
+                    errorText = null;
                     break;
 
                   case false:
@@ -194,6 +198,10 @@ class _AddContactScreenState extends State<AddContactScreen> {
 
                   case "alreadyExists":
                     errorText = "이미 저장한 연락처입니다.";
+                    break;
+
+                  default:
+                    errorText = "오류가 발생하였습니다.";
                     break;
                 }
                 setState(() {});
@@ -249,6 +257,7 @@ class _AddContactScreenState extends State<AddContactScreen> {
         }
         return null;
       },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       inputFormatters:
           required ? [FilteringTextInputFormatter.deny(RegExp('[ ]'))] : null,
       controller: controller,
